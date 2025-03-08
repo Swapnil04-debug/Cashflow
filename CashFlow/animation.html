@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(0deg, #08AEEA 0%, #2AF598 100%);
+      padding: 32px;
+      color: #333;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .transaction-list {
+      margin-top: 24px;
+    }
+
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f1f1;
+    }
+
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+
+    .amount {
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    .btn-back,
+    .btn-reset {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-back:hover,
+    .btn-reset:hover {
+      background-color: #34495e;
+    }
+
+    /* Piggy Bank Animation */
+    .piggy-bank-container {
+      position: relative;
+      display: inline-block;
+      margin-top: 20px;
+    }
+
+    .piggy-bank {
+      font-size: 80px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    /* Coin Animation */
+    .coin {
+      position: absolute;
+      font-size: 24px;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+    }
+
+    @keyframes dropCoin {
+      0% {
+        top: -30px;
+        opacity: 1;
+      }
+      100% {
+        top: 20px;
+        opacity: 0;
+      }
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+      75% { transform: rotate(-3deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">
+      <i class="fas fa-wallet"></i>
+      Your Transactions
+    </div>
+
+    <!-- Piggy Bank with Animation -->
+    <div class="piggy-bank-container">
+      <i class="fas fa-piggy-bank piggy-bank"></i>
+      <i class="fas fa-coins coin"></i>
+    </div>
+    
+    <div class="transaction-list" id="transaction-list"></div>
+
+    <a href="financio.html" class="btn-back">
+      <i class="fas fa-arrow-left"></i>
+      Back to Dashboard
+    </a>
+    <button class="btn-reset" onclick="resetTransactions()">
+      <i class="fas fa-sync-alt"></i>
+      Reset Transactions
+    </button>
+  </div>
+
+  <script>
+    function loadTransactions() {
+      const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+      const transactionList = document.getElementById('transaction-list');
+
+      transactionList.innerHTML = transactions.length === 0 
+        ? '<p>No transactions available.</p>'
+        : transactions.map(transaction => `
+            <div class="transaction-item">
+              <div>
+                <strong>${transaction.category}</strong>
+                <p>${transaction.description}</p>
+              </div>
+              <div class="amount">$${transaction.amount.toFixed(2)}</div>
+            </div>
+          `).join('');
+
+      // Trigger Piggy Bank Animation if a transaction exists
+      if (transactions.length > 0) {
+        animatePiggyBank();
+      }
+    }
+
+    function resetTransactions() {
+      localStorage.removeItem('transactions');
+      loadTransactions();
+    }
+
+    function animatePiggyBank() {
+      const piggyBank = document.querySelector('.piggy-bank');
+      const coin = document.querySelector('.coin');
+
+      // Coin drop animation
+      coin.style.animation = 'dropCoin 0.6s ease-in-out';
+
+      // Piggy bank wiggle
+      setTimeout(() => {
+        piggyBank.style.animation = 'wiggle 0.6s ease-in-out';
+      }, 400);
+
+      // Remove animation after completion
+      setTimeout(() => {
+        coin.style.animation = '';
+        piggyBank.style.animation = '';
+      }, 1000);
+    }
+
+    // Load transactions when page loads
+    document.addEventListener('DOMContentLoaded', loadTransactions);
+  </script>
+</body>
+</html>
